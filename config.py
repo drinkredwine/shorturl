@@ -1,0 +1,6 @@
+REDISHOST = ''
+REDISPORT = '6379'
+REDISDB = 0
+REDISPASSWD = ''
+SECRET_KEY = 'CHANGEME'
+SITEURL = 'http://example.com'
