@@ -1,13 +1,10 @@
 #!/bin/env python3
 
 from flask import flash, Flask, request, redirect, render_template, url_for
+import logging
 import random
+import redis
 import string
-
-try:
-    import redis
-except:
-    logging.error('redis module not loaded')
 
 
 # Create application object and read config from config.py
@@ -20,18 +17,29 @@ redis = redis.Redis(host=app.config['REDISHOST'],
                     password=app.config['REDISPASSWD'])
 
 
+def GetExpSeconds(unit, value):
+    if unit == 'seconds':
+        return value
+    elif unit == 'minutes':
+        return (60 * value)
+    elif unit == 'hours':
+        return (60 * 60 * value)
+    else:
+        return 0
+
 def GenShortKey(length=8):
     """ Function to generate a short random string to use as a key to build
         the short URLs. Default is 8 characters in length. """
     validchars = string.ascii_letters + string.digits
     shortkey = ''
+
     for i in range(length):
         shortkey += random.SystemRandom().choice(validchars)
 
     return shortkey
 
 
-def GetValue(key):
+def GetFullURL(key):
     """ Get value for specified key. This should be a valid URL. """
 
     # Attempt to get the full URL, will return None if key does not exist
@@ -47,13 +55,14 @@ def InsertData(shorturl, fullurl, expiration=0):
     try:
         # Set the key only if it does not exist to prevent overwriting
         # exisitng URL data.
-        redis.setnx(shorturl, fullurl)
+        redis.set(shorturl, fullurl)
 
         # Set expiration for key to remove shot URL after x seconds
         if expiration > 0:
-            redis.expire(shorturl, expiration)
+            redis.setex(shorturl, fullurl, expiration)
         return True
     except:
+        logging.exception('exception')
         return False
 
 
@@ -67,6 +76,14 @@ def InsertRoute():
     siteurl = app.config['SITEURL']
 
     furl = request.form['fullurl']
+    expunit = request.form['expunit']
+    if request.form['expval']:
+        expval = int(request.form['expval'])
+    else:
+        expval = 0
+
+    expiration = GetExpSeconds(expunit, expval)
+
     skey = GenShortKey()
 
     # If trailing / is not present add it to ensure a valid URL
@@ -75,29 +92,36 @@ def InsertRoute():
     else:
         surl = siteurl + '/' + skey
 
-    # Only accept input that begins with the http protocol
-    # Show an error on the page if invalid
-    if not furl.startswith('http'):
-        flash('Missing protocol for URL %s' % (furl))
-        return redirect(url_for('ShowIndex'))
-    else:
-        if InsertData(skey, furl):
-            flash('Full URL: %s' % furl)
-            flash('Short URL: %s' % surl)
-
+    if InsertData(skey, furl, expiration):
         # Show a status page with the full URL and short URL equivalent
         return render_template('index.html', fullurl=furl, shorturl=surl)
+    else:
+        flash('Error encountered saving data')
+        return redirect(url_for('ShowIndex'))
 
 
 @app.route('/<urlkey>')
 def ExpandURL(urlkey):
     """ Attempt to open the URL matching the provided key. """
-    furl = GetValue(urlkey)
+    furl = GetFullURL(urlkey)
     if furl:
         return redirect(furl)
     else:
         flash('Invalid or missing short URL')
+        logging.exception('exception')
         return redirect(url_for('ShowIndex'))
+
+
+@app.route('/<urlkey>/preview')
+def ViewURL(urlkey):
+    furl = GetFullURL(urlkey)
+
+    if furl:
+        surl = app.config['SITEURL'] + urlkey
+        return render_template('preview.html', fullurl=furl, shorturl=surl)
+    else:
+        flash('Preview failed: invalid or missing key')
+        return render_template('index.html')
 
 
 if __name__ == '__main__':

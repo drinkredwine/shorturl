@@ -1,12 +1,41 @@
+<!-- jinja2 macro to preselect an option based on request data. Otherwise no options are selected. -->
+{% macro listunits(units, selected) -%}
+    {% for unit in units %}
+        {% if selected == unit %}
+            <option value="{{ unit }}" selected>{{ unit }}</option>
+        {% else %}
+            <option value="{{ unit }}">{{ unit }}</option>
+        {% endif %}
+    {% endfor %}
+{%- endmacro %}
+
 <!doctype html>
 <title>URL shortener</title>
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <div class="page">
     <h3 id="formheader">Enter URL to shorten:</h3>
     <form action="{{ url_for('InsertRoute') }}" method="post">
-        <input type="url" size="64" name="fullurl" />
-        <input type="submit" name="submit" value="submit" />
+        <input  type="url" name="fullurl" size="64" value="{{ request.form.fullurl }}" />
+        <br />
+        Expire after:
+        <input id="expval" type="text" pattern=".*\d" maxlength="3" name="expval" size="4" title="up to 3 digit number" value="{{ request.form.expval }}" placeholder="0" />
+        <select name="expunit">
+            {{ listunits(['seconds', 'minutes', 'hours'], request.form.expunit) }}
+        </select>
+        <input id="submit" type="submit" name="submit" value="submit" />
     </form>
+    <p>
+    {% if shorturl %}
+    <div>
+        <table>
+            <tr>
+                <th>Short URL:</th>
+                <td>{{ shorturl }}</td>
+            </tr>
+        </table>
+    </div>
+    {% endif %}
+    </p>
 </div>
 
 <div class="messages">
