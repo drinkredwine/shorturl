@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 from flask import flash, Flask, request, redirect, render_template, url_for
+from os import urandom
 import logging
 import random
 import redis
@@ -10,6 +11,7 @@ import string
 # Create application object and read config from config.py
 app = Flask(__name__)
 app.config.from_object('config')
+app.config['SECRET_KEY'] = urandom(app.config['KEYLENGTH'])
 
 redis = redis.Redis(host=app.config['REDISHOST'],
                     port=app.config['REDISPORT'],
@@ -62,7 +64,6 @@ def InsertData(shorturl, fullurl, expiration=0):
             redis.setex(shorturl, fullurl, expiration)
         return True
     except:
-        logging.exception('exception')
         return False
 
 
@@ -84,7 +85,10 @@ def InsertRoute():
 
     expiration = GetExpSeconds(expunit, expval)
 
-    skey = GenShortKey()
+    if app.config['KEYLENGTH']:
+        skey = GenShortKey(app.config['KEYLENGTH'])
+    else:
+        skey = GenShortKey()
 
     # If trailing / is not present add it to ensure a valid URL
     if siteurl.endswith('/'):
@@ -108,7 +112,6 @@ def ExpandURL(urlkey):
         return redirect(furl)
     else:
         flash('Invalid or missing short URL')
-        logging.exception('exception')
         return redirect(url_for('ShowIndex'))
 
 
