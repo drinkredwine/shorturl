@@ -9,3 +9,11 @@ div.messages {
     margin-right: auto;
     width: 20%;
 }
+
+input#expval {
+    text-align: right;
+}
+
+th {
+    text-align: left;
+}
