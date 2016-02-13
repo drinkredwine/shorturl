@@ -20,11 +20,15 @@ redis = redis.Redis(host=app.config['REDISHOST'],
                     password=app.config['REDISPASSWD'])
 
 
-def GenShortKey():
+def GenShortKey(length=8):
     """ Function to generate a short random string to use as a key to build
         the short URLs. Default is 8 characters in length. """
     validchars = string.ascii_letters + string.digits
-    return ''.join(random.SystemRandom().choice(validchars) for i in range(8))
+    shortkey = ''
+    for i in range(length):
+        shortkey += random.SystemRandom().choice(validchars)
+
+    return shortkey
 
 
 def GetValue(key):
