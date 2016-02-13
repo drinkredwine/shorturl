@@ -32,6 +32,6 @@ REDISHOST = 'localhost'
 REDISPORT = '6379'
 REDISDB = 0
 REDISPASSWD = ''
-SECRET_KEY = 'CHANGEME'
-SITEURL = 'https://example.com'
+SITEURL = 'http://example.com'
+KEYLENGTH = 8
 ```
