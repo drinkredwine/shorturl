@@ -58,7 +58,7 @@ def GetFullURL(key):
 
 
 def InsertData(shorturl, fullurl, expiration=0):
-    """ Insert key and full URL into the database for later access. 
+    """ Insert key and full URL into the database for later access.
         Value of 0 results in no expiration of the key. """
 
     try:
@@ -93,7 +93,7 @@ def InsertRoute():
 
     expiration = GetExpSeconds(expunit, expval)
 
-    # Use KEYLENGTH setting if available otherwise the default length of 8 is used
+    # Use KEYLENGTH setting if available otherwise use the default length of 8
     if app.config['KEYLENGTH']:
         skey = GenShortKey(app.config['KEYLENGTH'])
     else:
@@ -106,7 +106,6 @@ def InsertRoute():
         surl = siteurl + '/' + skey
 
     if InsertData(skey, furl, expiration):
-        # Show a status page with the full URL and short URL equivalent
         return render_template('index.html', fullurl=furl, shorturl=surl)
     else:
         flash('Error encountered saving data')
