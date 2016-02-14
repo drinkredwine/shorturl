@@ -1,4 +1,5 @@
-<!-- jinja2 macro to preselect an option based on request data. Otherwise no options are selected. -->
+<!-- jinja2 macro to preselect an option based on request data. Otherwise no options are selected. 
+     This runs similar to a standard Python function and is called via the templating language. -->
 {% macro listunits(units, selected) -%}
     {% for unit in units %}
         {% if selected == unit %}
@@ -14,30 +15,37 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 <div class="page">
     <h3 id="formheader">Enter URL to shorten:</h3>
+
+    <!-- Form will be autopopulated with data from the POST request if available, otherwise inputs will show their default values. -->
     <form action="{{ url_for('InsertRoute') }}" method="post">
-        <input  type="url" name="fullurl" size="64" value="{{ request.form.fullurl }}" />
+        <input type="url" name="fullurl" size="64" value="{{ request.form.fullurl }}" />
         <br />
         Expire after:
+
+        <!-- Text input field which accepts only numeric characters up to three digits. -->
         <input id="expval" type="text" pattern=".*\d" maxlength="3" name="expval" size="4" title="up to 3 digit number" value="{{ request.form.expval }}" placeholder="0" />
+
+        <!-- Call the listunits function to properly populate the time units and select the value is rendered with POST data. -->
         <select name="expunit">
             {{ listunits(['seconds', 'minutes', 'hours'], request.form.expunit) }}
         </select>
         <input id="submit" type="submit" name="submit" value="submit" />
     </form>
+
     <p>
     {% if shorturl %}
-    <div>
-        <table>
-            <tr>
-                <th>Short URL:</th>
-                <td>{{ shorturl }}</td>
-            </tr>
-        </table>
-    </div>
+    <table>
+        <tr>
+            <th>Short URL:</th>
+            <td>{{ shorturl }}</td>
+        </tr>
+    </table>
     {% endif %}
     </p>
+
 </div>
 
+<!-- messages div used to show any flashed messages including errors. -->
 <div class="messages">
     {% with messages = get_flashed_messages() %}
         {% if messages %}
