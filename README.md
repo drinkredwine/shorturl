@@ -1,5 +1,12 @@
-# shorturl
+# shorturl with Exponea
+URL shortner that tracks users with Exponea.
+
+My work just extends original 'shorturl', created by https://github.com/evitalis.
+
+
+## shorturl (original description)
 Python 3 Flask web application to generate short URLs.
+
 
 ### Requirements
 
