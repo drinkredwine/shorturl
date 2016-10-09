@@ -2,5 +2,5 @@ REDISHOST = 'localhost'
 REDISPORT = '6379'
 REDISDB = 0
 REDISPASSWD = ''
-SITEURL = 'http://example.com'
+SITEURL = 'http://localhost:5000/'
 KEYLENGTH = 8

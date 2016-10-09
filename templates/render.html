@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+<head>
+<title>URL shortener</title>
+    <script>!function(i,t){function e(e){return function(){var n=arguments;if("initialize"==e&&n&&n[0].modify&&n[0].modify.overlay&&"loading"==t.readyState){var a="__inf__overlay__";t.write('<div id="'+a+'" style="position:absolute;background:#fff;left:0;top:0;width:100%;height:100%;z-index:1000000"></div>'),setTimeout(function(){var e=t.getElementById(a);e&&t.body.removeChild(e),i.exponea.__=!0},n[0].modify.delay||500)}this._.push([e,arguments])}}if(!i.exponea){var n,a,o="initialize identify update track trackLink trackEnhancedEcommerce getHtml showHtml showBanner showForm ping getAbTest getRecommendation".split(" "),r=t.createElement("script"),d="https:"===t.location.protocol?"https:":"http:";for(i.exponea={_:[]},a=0;a<o.length;a++)n=o[a],i.exponea[n]=e(n);r.type="text/javascript",r.async=!0,r.src=d+"//api.exponea.com/js/exponea.min.js",t.getElementsByTagName("head")[0].appendChild(r)}}(window,document);</script>
+    <script type="text/javascript">
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+        function decodeHtml(html) {
+            var txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        }
+
+        props = {};
+        props.referrer = document.referrer;
+        props.href = document.location.href;
+        props.search = document.location.search;
+        props.pathname = document.location.pathname;
+        props.urlfull = decodeHtml('{{ fullurl }}');
+        props.urlshort = '{{ shorturl }}';
+
+        utm_params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+        utm_params.forEach(function(item, index){
+            tmp = getParameterByName(item, props.urlfull);
+            if(tmp) { props[item] = tmp; }
+        });
+
+        exponea.initialize({
+                "token": "29ca970a-8778-11e6-939b-141877340e97",
+                "track": { "visits": true },
+                "modify": { "enabled": true, "overlay": false,"delay": 500 }
+                //, customer: window.loggedInCustomer // replace window.loggedInCustomer with id of your web site customer, e.g. "john.smith@gmail.com"
+        });
+        exponea.track('visit', props);
+
+        //window.location=props.urlfull;
+    </script>
+</head><body><a href="http://localhost:5000/SQnIXk47/render">http://localhost:5000/SQnIXk47/render</a></body></html>

@@ -125,7 +125,7 @@ def ExpandURL(urlkey):
 
 
 @app.route('/<urlkey>/preview')
-def ViewURL(urlkey):
+def RenderURL(urlkey):
     """ Using the preview option will allow for review of the full URL
         matching the given key. """
 
@@ -138,6 +138,19 @@ def ViewURL(urlkey):
         flash('Preview failed: invalid or missing key')
         return render_template('index.html')
 
+@app.route('/<urlkey>/render')
+def ViewURL(urlkey):
+    """ Using the preview option will allow for review of the full URL
+        matching the given key. """
+
+    furl = GetFullURL(urlkey)
+
+    if furl:
+        surl = app.config['SITEURL'] + '/' + urlkey
+        return render_template('render.html', fullurl=furl, shorturl=surl)
+    else:
+        flash('Preview failed: invalid or missing key')
+        return render_template('index.html')
 
 if __name__ == '__main__':
     app.run('127.0.0.1', 5000, debug=True)
